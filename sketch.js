@@ -1,6 +1,6 @@
 
-const tiles = [];
-const grid = [];
+let tiles = [];
+let grid = [];
 const DIM = 2;
 
 const BLANK = 0;
@@ -11,8 +11,8 @@ const RIGHT = 4;
 const UP = 5;
 
 // up, right down, left
-const rules = {
-  BLANK: [
+const rules = [
+   [ 
     // up
     [BLANK, UP],
     // right
@@ -22,7 +22,7 @@ const rules = {
     // left
     [BLANK, LEFT],
   ],
-  CROSS: [
+  [
     // up
     [CROSS, LEFT, RIGHT, DOWN],
     // right
@@ -32,7 +32,7 @@ const rules = {
     // left
     [CROSS, RIGHT, DOWN, UP],
   ],
-  DOWN: [
+   [
     // up
     [BLANK, UP],
     // right
@@ -42,7 +42,7 @@ const rules = {
     // left
     [CROSS, UP, DOWN, RIGHT],
   ],
-  LEFT: [
+   [
     // up
     [CROSS, LEFT, RIGHT, DOWN],
     // right
@@ -52,7 +52,7 @@ const rules = {
     // left
     [CROSS, RIGHT, DOWN, UP],
   ],
-  RIGHT: [
+   [
     // up
     [CROSS, DOWN, LEFT, RIGHT],
     // right
@@ -62,7 +62,7 @@ const rules = {
     // left
     [BLANK, LEFT],
   ],
-  UP: [
+  [
     // up
     [CROSS, LEFT, RIGHT, DOWN],
     // right
@@ -72,6 +72,28 @@ const rules = {
     // left
     [CROSS, RIGHT, DOWN, UP],
   ],
+]
+
+function checkValid(arr, valid) {
+  //console.log(arr, valid);
+  for (let i = arr.length - 1; i >= 0; i--) {
+    // VALID: [BLANK, RIGHT]
+    // ARR: [BLANK, UP, RIGHT, DOWN, LEFT]
+    // result in removing UP, DOWN, LEFT
+    let element = arr[i];
+    // console.log(element, valid.includes(element));
+    console.log(arr, valid);
+    if (!valid.includes(element)) {
+      arr.splice(i, 1);
+    }
+  }
+  // console.log(arr);
+  // console.log("----------");
+}
+
+// redraw on mouse click
+function mousePressed() {
+  redraw();
 }
 
 function preload() {
@@ -92,6 +114,9 @@ function setup() {
       options: [BLANK, CROSS, DOWN, LEFT, RIGHT, UP],
     }
   }
+  console.log(grid);
+  console.log("grid", DIM * DIM);
+  console.table(grid);
   // manually collapse a cell for testing.
   // grid[0].collapsed = true;
   // grid[0].options = [CROSS];
@@ -104,7 +129,8 @@ function draw() {
   background(220);
   let gridCopy = grid.slice();
   gridCopy.sort((a,b) => a.options.length - b.options.length);
-
+  console.table(grid)
+  console.table(gridCopy)
   let len = gridCopy[0].options.length;
   // we need a conditionl in case they are all the same length
   gridCopy = gridCopy.filter(cell => cell.options.length === len);
@@ -131,21 +157,56 @@ function draw() {
     }
   }
 
-  const nextTiles = [];
-  for (let row = 0; row < DIM; row++) {
-    for (let col = 0; col < DIM; col++) {
+  const nextGrid = [];
+  for (let row = 0; row < DIM; row++) {  // j
+    for (let col = 0; col < DIM; col++) { // i
       let index = row + col * DIM;
-      if (tiles[index].collapsed) {
-        nextTiles[index] = tiles[index];
+      if (grid[index].collapsed) {
+        nextGrid[index] = grid[index];
       } else {
+        let options = ["UP", "LEFT", "RIGHT", "DOWN", "BLANK", "CROSS"];
         // Look up
-        // Look right
-        // Look down
-        // Look left 
+        if (row > 0) { // row zero is the top row so there is no up.
+        let up = grid[col + (row - 1) * DIM];
+        console.log("up", up);
+          for (let options of up.options) {
+            let valid = rules[options][DOWN];
+            checkValid(options, valid);
+          }
+        }
+        // Look right // i = col, j = row
+        if (col < DIM - 1) {
+          let right = grid[col + 1 + row * DIM];
+          console.log("right", right)
+          for (let option of right.options) {
+            console.log(option)
+            let valid = rules[option][LEFT];
+            checkValid(options, valid);
+          }
+        }
+        // Look down // i = col, j = row
+        if (row < DIM - 1) {
+          let down = grid[col + (row + 1) * DIM];
+          for (let option of down.options) {
+            let valid = rules[option][UP];
+            checkValid(options, valid);
+          }
+        }
+        // Look left  // i = col, j = row
+        if (col > 0) {
+          let left = grid[col - 1 + row * DIM];
+          for (let option of left.options) {
+            let valid = rules[option][RIGHT];
+            checkValid(options, valid);
+          }
+        }
+        nextGrid[index] = {
+          options,
+          collapsed: false,
+        };
       }
     }
-
   }
-
+  grid = nextGrid;
   noLoop();
 }
