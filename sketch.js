@@ -3,6 +3,9 @@ let tiles = [];
 let grid = [];
 const DIM = 2;
 
+let widthState = 0;
+let heightState = 0;
+
 const BLANK = 0;
 const CROSS = 1;
 const DOWN = 2;
@@ -82,18 +85,13 @@ function checkValid(arr, valid) {
     // result in removing UP, DOWN, LEFT
     let element = arr[i];
     // console.log(element, valid.includes(element));
-    console.log(arr, valid);
+    // console.log(arr, valid);
     if (!valid.includes(element)) {
       arr.splice(i, 1);
     }
   }
   // console.log(arr);
   // console.log("----------");
-}
-
-// redraw on mouse click
-function mousePressed() {
-  redraw();
 }
 
 function preload() {
@@ -107,6 +105,9 @@ function preload() {
 
 function setup() {
   createCanvas(400, 400);
+  console.log(width, height);
+  widthState = width;
+  heightState = height;
 
   for (let i = 0; i < DIM * DIM; i++) {
     grid[i] = {
@@ -114,13 +115,13 @@ function setup() {
       options: [BLANK, CROSS, DOWN, LEFT, RIGHT, UP],
     }
   }
-  console.log(grid);
-  console.log("grid", DIM * DIM);
-  console.table(grid);
+  // console.log(grid);
+  // console.log("grid", DIM * DIM);
+  // console.table(grid);
   // manually collapse a cell for testing.
   // grid[0].collapsed = true;
   // grid[0].options = [CROSS];
-  grid[2].options = [BLANK, UP];
+  // grid[2].options = [BLANK, UP];
   grid[1].options = [CROSS, BLANK];
 
 }
@@ -129,8 +130,8 @@ function draw() {
   background(220);
   let gridCopy = grid.slice();
   gridCopy.sort((a,b) => a.options.length - b.options.length);
-  console.table(grid)
-  console.table(gridCopy)
+  // console.table(grid)
+  // console.table(gridCopy)
   let len = gridCopy[0].options.length;
   // we need a conditionl in case they are all the same length
   gridCopy = gridCopy.filter(cell => cell.options.length === len);
@@ -140,15 +141,16 @@ function draw() {
   const pick = random(cell.options);
   cell.options = [pick];
 
-  const w = width / DIM;
-  const h = height / DIM;
+  const w = widthState / DIM;
+  const h = heightState / DIM;
 
   for (let row = 0; row < DIM; row++) {
     for (let col = 0; col < DIM; col++) {
       // Find 2d array index of current tile;
       let cell = grid[row + col * DIM];
       if (cell.collapsed) {
-        image(tiles[cell.options[0]], col * w, row * h, w, h);
+        let index = cell.options[0];
+        image(tiles[index].img, col * w, row * h, w, h);
       } else {
         fill(0);
         stroke(255);
@@ -165,14 +167,16 @@ function draw() {
         nextGrid[index] = grid[index];
       } else {
         let options = ["UP", "LEFT", "RIGHT", "DOWN", "BLANK", "CROSS"];
+        let validOptions = [];
         // Look up
         if (row > 0) { // row zero is the top row so there is no up.
         let up = grid[col + (row - 1) * DIM];
         console.log("up", up);
           for (let options of up.options) {
             let valid = rules[options][DOWN];
-            checkValid(options, valid);
+            validOptions = validOptions.concat(valid);
           }
+          checkValid(options, validOptions);
         }
         // Look right // i = col, j = row
         if (col < DIM - 1) {
@@ -181,25 +185,30 @@ function draw() {
           for (let option of right.options) {
             console.log(option)
             let valid = rules[option][LEFT];
-            checkValid(options, valid);
+            validOptions = validOptions.concat(valid);
           }
+          checkValid(options, validOptions);
         }
         // Look down // i = col, j = row
         if (row < DIM - 1) {
           let down = grid[col + (row + 1) * DIM];
           for (let option of down.options) {
             let valid = rules[option][UP];
-            checkValid(options, valid);
+            validOptions = validOptions.concat(valid);
           }
+          checkValid(options, validOptions);
         }
         // Look left  // i = col, j = row
         if (col > 0) {
           let left = grid[col - 1 + row * DIM];
           for (let option of left.options) {
             let valid = rules[option][RIGHT];
-            checkValid(options, valid);
+            validOptions = validOptions.concat(valid);
           }
+          checkValid(options, validOptions);
         }
+
+
         nextGrid[index] = {
           options,
           collapsed: false,
@@ -208,5 +217,14 @@ function draw() {
     }
   }
   grid = nextGrid;
+  if (gridCopy.length === 0) {
+    console.log("done");
+    return;
+  }
   noLoop();
+}
+
+// redraw on mouse click
+function mousePressed() {
+  redraw();
 }
