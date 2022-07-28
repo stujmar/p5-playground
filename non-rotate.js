@@ -36,12 +36,12 @@ function setup() {
   createCanvas(400, 400);
   //randomSeed(15);
 
-  tiles[0] = new Tile(tileImages[0], ['0', '0', '0', '0']);
-  tiles[1] = new Tile(tileImages[1], ['1', '1', '1', '1']);
-  tiles[2] = new Tile(tileImages[2], ['0', '1', '1', '1']);
-  tiles[3] = new Tile(tileImages[3], ['1', '0', '1', '1']);
-  tiles[4] = new Tile(tileImages[4], ['1', '1', '1', '0']);
-  tiles[5] = new Tile(tileImages[5], ['1', '1', '0', '1']);
+  tiles[0] = new Tile(tileImages[0], ['AA', 'AA', 'AA', 'AA']);
+  tiles[1] = new Tile(tileImages[1], ['BBB', 'BBB', 'BBB', 'BBB']);
+  tiles[2] = new Tile(tileImages[2], ['AA', 'BBB', 'BBB', 'BBB']);
+  tiles[3] = new Tile(tileImages[3], ['BBB', 'AA', 'BBB', 'BBB']);
+  tiles[4] = new Tile(tileImages[4], ['BBB', 'BBB', 'BBB', 'AA']);
+  tiles[5] = new Tile(tileImages[5], ['BBB', 'BBB', 'AA', 'AA']);
  
   // tiles[0] = new Tile(tileImages[0], ['AAA', 'AAA', 'AAA', 'AAA']);
   // tiles[1] = new Tile(tileImages[1], ['ABA', 'ABA', 'ABA', 'AAA']);
@@ -70,17 +70,18 @@ function setup() {
     tiles[i].index = i;
   }
 
-  const initialTileCount = tiles.length;
-  for (let i = 0; i < initialTileCount; i++) {
-    let tempTiles = [];
-    for (let j = 0; j < 4; j++) {
-      console.log(i, j);
-      tempTiles.push(tiles[i].rotate(j));
-    }
-    tempTiles = removeDuplicatedTiles(tempTiles);
-    tiles = tiles.concat(tempTiles);
-  }
-  console.log(tiles.length);
+  // Rotate the tiles?
+  // const initialTileCount = tiles.length;
+  // for (let i = 0; i < initialTileCount; i++) {
+  //   let tempTiles = [];
+  //   for (let j = 0; j < 4; j++) {
+  //     console.log(i, j);
+  //     tempTiles.push(tiles[i].rotate(j));
+  //   }
+  //   tempTiles = removeDuplicatedTiles(tempTiles);
+  //   tiles = tiles.concat(tempTiles);
+  // }
+  // console.log(tiles.length);
 
   // Generate the adjacency rules based on edges
   for (let i = 0; i < tiles.length; i++) {
