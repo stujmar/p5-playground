@@ -77,6 +77,70 @@ const rules = [
   ],
 ]
 
+const oldRules = [
+  [ 
+   // up
+   [BLANK, UP],
+   // right
+   [BLANK, RIGHT],
+   // down
+   [BLANK, DOWN],
+   // left
+   [BLANK, LEFT],
+ ],
+ [
+   // up
+   [CROSS, LEFT, RIGHT, DOWN],
+   // right
+   [CROSS, UP, DOWN, RIGHT],
+   // down
+   [CROSS, LEFT, UP, RIGHT],
+   // left
+   [CROSS, RIGHT, DOWN, UP],
+ ],
+  [
+   // up
+   [BLANK, UP],
+   // right
+   [CROSS, LEFT, UP],
+   // down
+   [CROSS, LEFT, RIGHT, UP],
+   // left
+   [CROSS, UP, DOWN, RIGHT],
+ ],
+  [
+   // up
+   [CROSS, LEFT, RIGHT, DOWN],
+   // right
+   [RIGHT, BLANK],
+   // down
+   [CROSS, LEFT, UP, RIGHT],
+   // left
+   [CROSS, RIGHT, DOWN, UP],
+ ],
+  [
+   // up
+   [CROSS, DOWN, LEFT, RIGHT],
+   // right
+   [CROSS, UP, DOWN, LEFT],
+   // down
+   [CROSS, LEFT, UP, RIGHT],
+   // left
+   [BLANK, LEFT],
+ ],
+ [
+   // up
+   [CROSS, LEFT, RIGHT, DOWN],
+   // right
+   [CROSS, LEFT, UP, DOWN],
+   // down
+   [DOWN, BLANK]
+   // left
+   [CROSS, RIGHT, DOWN, UP],
+ ],
+]
+
+
 function checkValid(arr, valid) {
   //console.log(arr, valid);
   for (let i = arr.length - 1; i >= 0; i--) {

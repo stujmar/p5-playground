@@ -1,79 +1,172 @@
-console.log("----------");
 const tiles = [];
-const grid = [];
+const tileImages = [];
 
-const DIM = 2;
+let grid = [];
 
-const BLANK = 0;
-const UP = 1;
-const RIGHT = 2;
-const DOWN = 3;
-const LEFT = 4;
+const DIM = 20;
 
 function preload() {
-  tiles[0] = loadImage("/assets/tile_blank.png");
-  tiles[1] = loadImage("/assets/tile_up.png");
-  tiles[2] = loadImage("/assets/tile_right.png");
-  tiles[3] = loadImage("/assets/tile_down.png");
-  tiles[4] = loadImage("/assets/tile_left.png");
+  const path = 'assets';
+  tileImages[0] = loadImage(`${path}/tile_blank.png`);
+  tileImages[1] = loadImage(`${path}/tile_up.png`);
 }
 
 function setup() {
-  createCanvas(400, 400);
+  createCanvas(600, 600);
 
-  for (let i = 0; i < DIM * DIM; i++) {
-    grid[i] = {
-      collapsed: false,
-      options: [BLANK, UP, RIGHT, DOWN, LEFT],
-    };
+  // Create tiles
+  tiles[0] = new Tile(tileImages[0], [0,0,0,0]); // blank
+  tiles[1] = new Tile(tileImages[1], [1,1,0,1]); // up
+  tiles[2] = tiles[1].rotate(1); // right
+  tiles[3] = tiles[1].rotate(2); // down
+  tiles[4] = tiles[1].rotate(3); // left
+
+  // Generate adjacency rules based on the edges.
+  for (let i = 0; i < tiles.length; i++) {
+    const tile = tiles[i];
+    tile.analyze(tiles);
   }
+  
+  // Create cell for each spot on the grid
+  for (let i = 0; i < DIM * DIM; i++) {
+    grid[i] = new Cell(tiles.length);
+  }
+}
+  
 
-  grid[2].options = [BLANK, UP];
-  grid[0].options = [BLANK, LEFT];
+function checkValid(arr, valid) {
+  //console.log(arr, valid);
+  for (let i = arr.length - 1; i >= 0; i--) {
+    // VALID: [BLANK, RIGHT]
+    // ARR: [BLANK, UP, RIGHT, DOWN, LEFT]
+    // result in removing UP, DOWN, LEFT
+    let element = arr[i];
+    // console.log(element, valid.includes(element));
+    if (!valid.includes(element)) {
+      arr.splice(i, 1);
+    }
+  }
+  // console.log(arr);
+  // console.log("----------");
+}
+
+function startOver() {
+  // Create cell for each spot on the grid
+  for (let i = 0; i < DIM * DIM; i++) {
+    grid[i] = new Cell(tiles.length);
+  }
+}
+
+// Progress the loop if mouse is pressed
+function mousePressed() {
+  redraw();
 }
 
 function draw() {
   background(0);
 
-  // Pick cell with least entropy
-  let gridCopy = grid.slice();
-  gridCopy.sort((a,b) => a.options.length - b.options.length);
-  
-  gridCopy = gridCopy.filter(cell => cell.options.length === gridCopy[0].options.length);
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  const cell = random(gridCopy);
-  cell.collapsed = true;
-  const pick = random(cell.options);
-  cell.options = [pick];
-
-  console.log(grid);
-  console.log(gridCopy);
-
-  let w = width / DIM;
-  let h = height / DIM;
-  for (let j= 0; j < DIM; j++) { // row y
-    for (let i = 0; i < DIM; i++) { // column x
+  const w = width / DIM;
+  const h = height / DIM;
+  for (let j = 0; j < DIM; j++) {
+    for (let i = 0; i < DIM; i++) {
       let cell = grid[i + j * DIM];
       if (cell.collapsed) {
         let index = cell.options[0];
-        image(tiles[index], i * w, j * h, w, h);
-    } else {
-      fill("#ff0000");
-      rect(i * w, j * h, w, h);
+        image(tiles[index].img, i * w, j * h, w, h);
+      } else {
+        noFill();
+        stroke(51);
+        rect(i * w, j * h, w, h);
+      }
     }
   }
+
+  // Pick cell with least entropy
+  let gridCopy = grid.slice();
+  gridCopy = gridCopy.filter((a) => !a.collapsed);
+  // console.table(grid);
+  // console.table(gridCopy);
+
+  if (gridCopy.length == 0) {
+    return;
+  }
+  gridCopy.sort((a, b) => {
+    return a.options.length - b.options.length;
+  });
+
+  let len = gridCopy[0].options.length;
+  let stopIndex = 0;
+  for (let i = 1; i < gridCopy.length; i++) {
+    if (gridCopy[i].options.length > len) {
+      stopIndex = i;
+      break;
+    }
   }
 
+  if (stopIndex > 0) gridCopy.splice(stopIndex);
+  const cell = random(gridCopy);
+  cell.collapsed = true;
+  const pick = random(cell.options);
+  if (pick === undefined) {
+    startOver();
+    return;
+  }
+  cell.options = [pick];
 
-  noLoop();
+  const nextGrid = [];
+  for (let j = 0; j < DIM; j++) {
+    for (let i = 0; i < DIM; i++) {
+      let index = i + j * DIM;
+      if (grid[index].collapsed) {
+        nextGrid[index] = grid[index];
+      } else {
+        let options = new Array(tiles.length).fill(0).map((x, i) => i);
+        // Look up
+        if (j > 0) {
+          let up = grid[i + (j - 1) * DIM];
+          let validOptions = [];
+          for (let option of up.options) {
+            let valid = tiles[option].down;
+            validOptions = validOptions.concat(valid);
+          }
+          checkValid(options, validOptions);
+        }
+        // Look right
+        if (i < DIM - 1) {
+          let right = grid[i + 1 + j * DIM];
+          let validOptions = [];
+          for (let option of right.options) {
+            let valid = tiles[option].left;
+            validOptions = validOptions.concat(valid);
+          }
+          checkValid(options, validOptions);
+        }
+        // Look down
+        if (j < DIM - 1) {
+          let down = grid[i + (j + 1) * DIM];
+          let validOptions = [];
+          for (let option of down.options) {
+            let valid = tiles[option].up;
+            validOptions = validOptions.concat(valid);
+          }
+          checkValid(options, validOptions);
+        }
+        // Look left
+        if (i > 0) {
+          let left = grid[i - 1 + j * DIM];
+          let validOptions = [];
+          for (let option of left.options) {
+            let valid = tiles[option].right;
+            validOptions = validOptions.concat(valid);
+          }
+          checkValid(options, validOptions);
+        }
+
+        // I could immediately collapse if only one option left?
+        nextGrid[index] = new Cell(options);
+      }
+    }
+  }
+
+  // grid = nextGrid;
 }

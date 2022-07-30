@@ -24,29 +24,49 @@ class Tile {
   }
 
   analyze(tiles) {
-    for (let i = 0; i < tiles.length; i++) {
-      let tile = tiles[i];
-
-      // Tile 5 can't match itself
-      if (tile.index == 5 && this.index == 5) continue;
-
-      // UP
-      if (compareEdge(tile.edges[2], this.edges[0])) {
-        this.up.push(i);
+    for (let tile of tiles) {
+      // Connection for up.
+      if (tile.edges[2] == this.edges[0]) {
+          this.up.push(tile);
       }
-      // RIGHT
-      if (compareEdge(tile.edges[3], this.edges[1])) {
-        this.right.push(i);
+      // Connection for right.
+      if (tile.edges[3] == this.edges[1]) {
+          this.right.push(tile);
       }
-      // DOWN
-      if (compareEdge(tile.edges[0], this.edges[2])) {
-        this.down.push(i);
+      // Connection for down.
+      if (tile.edges[0] == this.edges[2]) {
+        this.down.push(tile);
       }
-      // LEFT
-      if (compareEdge(tile.edges[1], this.edges[3])) {
-        this.left.push(i);
+      // Connection for left.
+      if (tile.edges[1] == this.edges[3]) {
+          this.left.push(tile);
       }
     }
+
+    // From github:
+    // for (let i = 0; i < tiles.length; i++) {
+    //   let tile = tiles[i];
+
+    //   // Tile 5 can't match itself
+    //   if (tile.index == 5 && this.index == 5) continue;
+
+    //   // UP
+    //   if (compareEdge(tile.edges[2], this.edges[0])) {
+    //     this.up.push(i);
+    //   }
+    //   // RIGHT
+    //   if (compareEdge(tile.edges[3], this.edges[1])) {
+    //     this.right.push(i);
+    //   }
+    //   // DOWN
+    //   if (compareEdge(tile.edges[0], this.edges[2])) {
+    //     this.down.push(i);
+    //   }
+    //   // LEFT
+    //   if (compareEdge(tile.edges[1], this.edges[3])) {
+    //     this.left.push(i);
+    //   }
+    // }
   }
 
   rotate(num) {
