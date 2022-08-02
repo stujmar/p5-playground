@@ -1,4 +1,4 @@
-console.log("cat dogging")
+console.log("mapping trail")
 
 class Cell {
   constructor(value, cursor=false) {
@@ -98,27 +98,37 @@ let canvasHeight;
 
 let grid = [];
 
-const DIM = 5;
+const DIM = 15;
 
 function preload() {
   count = 0
   const path = 'assets';
-  tileImages[0] = loadImage(`${path}/catdog_blank.png`);
-  tileImages[1] = loadImage(`${path}/catdog_cat.png`);
-  tileImages[2] = loadImage(`${path}/catdog_dog.png`);
-  tileImages[3] = loadImage(`${path}/catdog_pipe.png`);
-  tileImages[4] = loadImage(`${path}/catdog_el.png`);
+  // no rotation
+  tileImages[0] = loadImage(`${path}/hike_blank.png`);
+  tileImages[1] = loadImage(`${path}/hike_start.png`);
+  tileImages[2] = loadImage(`${path}/hike_finish.png`);
+  // rotate 90 degrees
+  tileImages[3] = loadImage(`${path}/hike_pipe_primary.png`);
+  tileImages[4] = loadImage(`${path}/hike_pipe_secondary.png`);
+  tileImages[5] = loadImage(`${path}/hike_pipe_cross.png`);
+  // full rotation
+  tileImages[6] = loadImage(`${path}/hike_sidequest.png`);
+  tileImages[7] = loadImage(`${path}/hike_tee.png`);
+  tileImages[8] = loadImage(`${path}/hike_primary_el.png`);
+  tileImages[9] = loadImage(`${path}/hike_secondary_el.png`);
+  tileImages[10] = loadImage(`${path}/hike_tee_two.png`);
+  tileImages[11] = loadImage(`${path}/hike_cross_two.png`);
 }
 
-function addRotation(tiles, tileIndex) {
-  for (let i = 1; i < 4; i++) {
+function addRotation(tiles, tileIndex, turns=3) {
+  for (let i = 1; i < turns+1; i++) {
     tiles.push(tiles[tileIndex].rotate(i));
   }
 }
 
 function setup() {
   let element = document.querySelector("body");
-  let canvasDim = element.clientWidth < 350 ? element.clientWidth - 20 : 350;
+  let canvasDim = element.clientWidth < 450 ? element.clientWidth - 20 : 450;
   createCanvas(canvasDim, canvasDim);
   canvasWidth = width;
   canvasHeight = height;
@@ -148,13 +158,31 @@ function setup() {
 
   canvas.style.marginRight = "auto";
   // Create tiles
-  tiles[0] = new Tile(tileImages[0], ["SSS","SSS","SSS","SSS"]); // blank
-  tiles[1] = new Tile(tileImages[1], ["SSS","BBB","SSS","SSS"]); // cat
-  tiles[2] = new Tile(tileImages[2], ["SSS","SSS","SSS","BBB"]); // dog
-  tiles[3] = new Tile(tileImages[3], ["SSS","BBB","SSS","BBB"]); // pipe
-  tiles[4] = new Tile(tileImages[4], ["SSS","BBB","BBB","SSS"]); // el
-  addRotation(tiles, 3);
-  addRotation(tiles, 4);
+  // no rotation
+  tiles[0] = new Tile(tileImages[0], ["TTT","TTT","TTT","TTT"]); // blank
+  tiles[1] = new Tile(tileImages[1], ["TTT","TTT","TTT","AAA"]); // start
+  tiles[2] = new Tile(tileImages[2], ["TTT","AAA","TTT","TTT"]); // finish
+  // rotate 90 degrees
+  tiles[3] = new Tile(tileImages[3], ["TTT","AAA","TTT","AAA"]); // pipe primary
+  tiles[4] = new Tile(tileImages[4], ["TTT","BBB","TTT","BBB"]); // pipe secondary
+  tiles[5] = new Tile(tileImages[5], ["BBB","AAA","BBB","AAA"]); // pipe cross
+  addRotation(tiles, 3, 2);
+  addRotation(tiles, 4, 2);
+  addRotation(tiles, 5, 2);
+  // full rotation
+  tiles[6] = new Tile(tileImages[6], ["TTT","BBB","TTT","TTT"]); // sidequest
+  tiles[7] = new Tile(tileImages[7], ["TTT","AAA","BBB","AAA"]); // tee
+  tiles[8] = new Tile(tileImages[8], ["TTT","AAA","AAA","TTT"]); // primary el
+  tiles[9] = new Tile(tileImages[9], ["TTT","BBB","BBB","TTT"]); // secondary el
+  tiles[10] = new Tile(tileImages[10], ["TTT","AAA","AAA","BBB"]); // tee two
+  tiles[11] = new Tile(tileImages[11], ["BBB","AAA","AAA","BBB"]); // cross two
+  addRotation(tiles, 6);
+  addRotation(tiles, 7);
+  addRotation(tiles, 8);
+  addRotation(tiles, 9);
+  addRotation(tiles, 10);
+  addRotation(tiles, 11);
+  // addRotation(tiles, 4);
 
   // Generate adjacency rules based on the edges.
   for (let i = 0; i < tiles.length; i++) {
@@ -199,14 +227,18 @@ function placeImages(grid, width, height, path=[]) {
       if (cell.collapsed) {
         let index = cell.options[0];
         if (path.length > 0 && !path.includes(i + j * DIM)) {
-          image(tiles[0].img, i * w, j * h, w, h);
+          // console.log(w, h)
+          image(tiles[index].img, i * w, j * h, w, h);
+          colorMode(RGB);
+          fill(0, 0, 0, 100);
+          rect(i * w, j * h, w, h);
         } else {
           image(tiles[index].img, i * w, j * h, w, h);
         }
         if (cell.cursor) {
           noStroke();
-          fill(color(0, 255, 0, 70));
-          circle(i * w + (w/2), j * h + (h/2), w,);
+          fill(color(255, 50, 50));
+          circle(i * w + (w/2), j * h + (h/2), w/2,);
         }
       } else {
         noFill();
@@ -220,7 +252,7 @@ function placeImages(grid, width, height, path=[]) {
 
 function draw() {
   background(0);
-
+  // console.log("hello");
   placeImages(grid, width, height);
 
   // Pick cell with least entropy
@@ -254,12 +286,11 @@ function draw() {
   cell.options = [pick];
 
   grid[0].collapsed = true;
-  grid[0].options = [1];
-  grid[0].cursor = false;
-  let walker = grid[0];
+  grid[0].options = [2];
   // console.log(walker);
-  grid[24].collapsed = true;
-  grid[24].options = [2];
+  grid[224].collapsed = true;
+  grid[224].options = [1];
+  grid[224].cursor = false;
 
   const nextGrid = [];
   for (let j = 0; j < DIM; j++) {
@@ -269,6 +300,7 @@ function draw() {
         nextGrid[index] = grid[index];
       } else {
         let options = new Array(tiles.length).fill(0).map((x, i) => i);
+        // console.log(options);
         // filter out 1 and 2 from options, cat and dog
         options = options.filter((x) => x != 1 && x != 2);
         // Look up
@@ -316,7 +348,7 @@ function draw() {
          let nonValid = []; 
          for (let option of options) {
           let up = tiles[option].edges[0];
-          if (up !== "SSS") nonValid.push(option); 
+          if (up !== "TTT") nonValid.push(option); 
          }
          // filter nonValid out of options
           options = options.filter((x) => !nonValid.includes(x));
@@ -326,7 +358,7 @@ function draw() {
          let nonValid = []; 
          for (let option of options) {
           let down = tiles[option].edges[2];
-          if (down !== "SSS") nonValid.push(option); 
+          if (down !== "TTT") nonValid.push(option); 
          }
          // filter nonValid out of options
           options = options.filter((x) => !nonValid.includes(x));
@@ -336,7 +368,7 @@ function draw() {
          let nonValid = []; 
          for (let option of options) {
           let left = tiles[option].edges[3];
-          if (left !== "SSS") nonValid.push(option); 
+          if (left !== "TTT") nonValid.push(option); 
          }
          // filter nonValid out of options
           options = options.filter((x) => !nonValid.includes(x));
@@ -346,7 +378,7 @@ function draw() {
          let nonValid = []; 
          for (let option of options) {
           let left = tiles[option].edges[1];
-          if (left !== "SSS") nonValid.push(option); 
+          if (left !== "TTT") nonValid.push(option); 
          }
          // filter nonValid out of options
           options = options.filter((x) => !nonValid.includes(x));
@@ -360,6 +392,7 @@ function draw() {
   }
   grid = nextGrid;
   // noLoop();
+
   let notCollapsed = 0
   for (item in grid) {
     if (!grid[item].collapsed) {
@@ -375,16 +408,16 @@ function pathFind(grid, tiles, width, height) {
   console.log("let's find a path");
 
   // Temp fix for that darn cat head connection.
-  if (tiles[grid[1].options[0]].edges[3] !== "BBB" ||
-    tiles[grid[23].options[0]].edges[1] !== "BBB") {
+  if (tiles[grid[1].options[0]].edges[3] !== "AAA" ||
+    tiles[grid[223].options[0]].edges[1] !== "AAA") {
     location.reload();
   }
 
 
-  let start = 0;
+  let start = 224;
   let path = [];
   let lastVisited = 0;
-  let lastDir = 1;
+  let lastDir = 3;
   let current = start;
   finished = false;
  
@@ -394,7 +427,7 @@ function pathFind(grid, tiles, width, height) {
         // console.log(tiles[grid[i].options]);
         grid[lastVisited].cursor = false;
        
-        if (current !== grid.length - 1){
+        if (current !== 0) {
           grid[current].cursor = true;
         }
         placeImages(grid, width, height);
@@ -406,32 +439,32 @@ function pathFind(grid, tiles, width, height) {
         if (currentOption == 2) {
           // get button from html
           let button = document.querySelector("button");
-          button.innerHTML = "THAT'S A CATDOG";
+          button.innerHTML = "That's a hikeable path.";
           placeImages(grid, width, height, path);
           noLoop();
         }
         // If you can move right
-        if (tiles[grid[current].options[0]].edges[1] === "BBB" && lastDir !== 3) {
+        if (tiles[grid[current].options[0]].edges[1] === "AAA" && lastDir !== 3) {
           lastDir = 1;
           current += 1;
         }
         // If you can move down
-        else if (tiles[grid[current].options[0]].edges[2] === "BBB" && lastDir !== 0) {
+        else if (tiles[grid[current].options[0]].edges[2] === "AAA" && lastDir !== 0) {
           lastDir = 2;
           current += DIM;
         }
         // If you can move left
-        else if (tiles[grid[current].options[0]].edges[3] === "BBB" && lastDir !== 1) {
+        else if (tiles[grid[current].options[0]].edges[3] === "AAA" && lastDir !== 1) {
           lastDir = 3;
           current -= 1;
         }
         // If you can move up
-        else if (tiles[grid[current].options[0]].edges[0] === "BBB" && lastDir !== 2) {
+        else if (tiles[grid[current].options[0]].edges[0] === "AAA" && lastDir !== 2) {
           lastDir = 0;
           current -= DIM;
         }
 
-      }, i * 100);
+      }, i * 50);
     
     }
 
