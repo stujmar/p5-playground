@@ -1,0 +1,26 @@
+.ctr-panel {
+  border: 2px solid rgb(10, 54, 9);
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 5px;
+  border-radius: 8px;
+  box-shadow: 0 0 5px black;
+  background-color: green;
+}
+
+.slider-wrapper {
+  margin: 10px 0 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-start {
+  background: white;
+  cursor: pointer;
+}
+
+.btn-start:hover {
+  background: #e0fc46;
+  color: #333;
+}

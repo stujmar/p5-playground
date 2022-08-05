@@ -6,16 +6,21 @@ let green = 255;
 let blue = 255;
 let rate = 0;
 let go = false;
+let angle = 137.5
 let fillColor = "black";
 // turn the body of the page black
 document.body.style.background = 'green';
+let slider = document.getElementById('angle');
+let rateSilder = document.getElementById('rate');
 
 function start() {
   // get button 
   const button = document.querySelector('button');
+  angle = slider.value/10;
+  console.log(angle, rate)
   // hide button
   // button.style.display = 'none';
-  rate = 1;
+  rate = rateSilder.value/1000;
   fillColor = "yellow";
   go = true;
 }
@@ -43,7 +48,7 @@ function draw() {
 
   // stop drawing
   if (go) {
-  let a = n * 137.5;
+  let a = n * angle;
   let r = c * sqrt(n);
   
   let x = r * cos(a) + width / 2;
