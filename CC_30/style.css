@@ -1,3 +1,46 @@
+.hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  padding: 25px;
+  max-width: 600px;
+  margin: 25px auto 15px;
+}
+
+
+
+.settings-wrapper, #start {
+  border: 2px solid #134703;
+  background: rgb(150, 255, 150);
+  width: max-content;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px #13470350;
+  cursor: pointer;
+}
+.settings-wrapper {
+  padding: 4px 5px 0;
+}
+#start, .title {
+  padding: 2px 5px;
+  font-weight: bold;
+  font-family: monospace;
+  font-size: 1.2em;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: lighter;
+  text-decoration: underline;
+}
+.settings-wrapper:hover, #start:hover {
+  box-shadow: 0 2px 3px #13470350;
+  background-color: rgb(130, 253, 130);
+}
+
+.settings-wrapper svg{
+  stroke: #134703;
+}
+
 .ctr-panel {
   border: 2px solid rgb(10, 54, 9);
   position: absolute;
@@ -6,7 +49,7 @@
   padding: 5px;
   border-radius: 8px;
   box-shadow: 0 0 5px black;
-  background-color: green;
+  background-color: rgb(187, 255, 187);
 }
 
 .slider-wrapper {
