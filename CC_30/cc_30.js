@@ -1,4 +1,5 @@
 console.log('.. loading phyllotaxis.js ...');
+
 let n = 0;
 let c = 5;
 let red = 255;
@@ -7,55 +8,102 @@ let blue = 255;
 let rate = 0;
 let go = false;
 let angle = 137.5
-// let fillColor = "black";
-// turn the body of the page black
-document.body.style.background = 'rgb(150, 255, 150)';
+let canvas;
+
+let startBtn = document.getElementById('start');
+startBtn.addEventListener('click', start);
+let saveBtn = document.getElementById('save');
+saveBtn.addEventListener('click', save);
+let clearBtn = document.getElementById('clear');
+clearBtn.addEventListener('click', clearCanvas);
 let slider = document.getElementById('angle');
+let defaultBtn = document.getElementById('reset');
+defaultBtn.addEventListener('click', reset);
+let downloadBtn = document.getElementById('download');
 let rateSilder = document.getElementById('rate');
 let settingButton = document.getElementById('btn-settings');
+let clickAway = document.getElementById('click-away');
+clickAway.addEventListener('click', toggleSettings); 
 settingButton.addEventListener('click', toggleSettings);
 
 function toggleSettings() {
   const settings = document.getElementById('settings');
-  if (settings.style.display === 'none') {
-  settings.style.display = 'block';
+  if (settings.style.opacity == 0) {
+    clickAway.style.display = 'block';
+    settings.style.opacity = 1;
   } else {
-  settings.style.display = 'none';
+    clickAway.style.display = 'none';
+    settings.style.opacity = 0;
   }
 }
 
 function start() {
-  // get button 
-  // const button = document.querySelector('#start');
-  // const settingButton = document.querySelector('#settings');
-  angle = slider.value/10;
-  console.log(angle, rate)
-  // hide button
-  // button.style.display = 'none';
-  rate = rateSilder.value/1000;
-  // fillColor = "yellow";
-  go = true;
+  if (!go) {
+    startBtn.innerHTML = 'Stop';
+    angle = slider.value/10;
+    rate = rateSilder.value/1000;
+    go = true;
+    
+  } else {
+    go = false;
+    startBtn.innerHTML = 'Start';
+  }
 }
 
+function save() {
+  angle = slider.value/10;
+  rate = rateSilder.value/1000;
+  // go = true;
+  toggleSettings();
+}
+
+function download() {
+  console.log('downloading...');
+  // saveCanvas(canvas, 'phyllotaxis', 'jpg');
+  // let myCanvas = document.querySelector('canvas');
+  let canvasWrapper = document.getElementById('canvas-wrapper');
+  html2canvas(canvasWrapper).then(function(canvas) {
+    canvas.style.background = 'rgb(150, 255, 150)';
+    // document.body.appendChild(canvas);
+    saveCanvas(canvas, 'phyllotaxis', 'jpg');
+  });
+  
+}
+
+function reset() {
+  angle = slider.value/10;
+  rate = rateSilder.value/1000;
+  console.log('resets defaults...');
+  n = 0;
+  c = 5;
+  red = 255;
+  green = 255;
+  blue = 255;
+  // rate = 1;
+
+  // angle = 137.5
+ }
+
+ function clearCanvas() {
+  background(150, 255, 150);
+
+ }
+
 function setup() {
-  createCanvas(400, 400);
+  let width = document.documentElement.clientWidth;
+  width = width < 400 ? width - 20 : 400;
+  let myCanvas = createCanvas(width, width);
+  myCanvas.parent('canvas-wrapper');
   background(150, 255, 150);
   colorMode(RGB);
   angleMode(DEGREES);
   blue=255;
-  // get canvas
-const canvas = document.querySelector('canvas');
-// center the canvas
-// console.log(canvas)
-// green background on canvas
-canvas.style.background = 'rgb(150, 255, 150)';
-canvas.style.display = 'block';
-canvas.style.borderRadius = "100%";
-canvas.style.margin = 'auto';
-// get button
-const button = document.getElementById('start');
-// add event listener
-button.addEventListener('click', start);
+  canvas = document.querySelector('canvas');
+  canvas.style.background = 'rgb(150, 255, 150)';
+  canvas.style.display = 'block';
+  canvas.style.borderRadius = "100%";
+  canvas.style.margin = 'auto';
+  downloadBtn.style.display = 'none';
 }
 
 function draw() {
@@ -74,5 +122,14 @@ function draw() {
   green = blue === 0 && green > 50 ? green - .25 : green;
   ellipse(x, y, 15, 15);
   n += rate;
+    if (n > 200 && downloadBtn.style.display === 'none') {
+      downloadBtn.style.display = 'block';
+      document.body.appendChild(downloadBtn);
+      downloadBtn.addEventListener('click', download);
+    }
+
+
   }
+
+  
 }
