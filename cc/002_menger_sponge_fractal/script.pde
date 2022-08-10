@@ -35,6 +35,7 @@ class Box {
 
 }
 
+int detailLevel = 3;
 int clickCount = 0;
 float a = 0;
 ArrayList<Box> sponge = new ArrayList<Box>();
@@ -53,7 +54,7 @@ void reset() {
 
 void mousePressed() {
   // log the current state of the sponge
-  if (clickCount < 2) {
+  if (clickCount < detailLevel) {
     ArrayList<Box> next = new ArrayList<Box>();
     for (Box b : sponge) {
       ArrayList<Box> newBoxes = b.generate();
@@ -73,6 +74,7 @@ void draw() {
 
   translate(width / 2, height / 2);
   rotateX(a);
+  rotateY(a);
   // old way
   // box(200);
   for (Box b: sponge) {
