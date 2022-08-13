@@ -5,11 +5,29 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <script src="./snake.js" defer></script>
   <script src="./snakeGame.js" defer></script>
   <title>Snake Game</title>
 </head>
 <body style="background: rgb(55,55,55);">
     <div id="canvas-parent"></div>
+    <div class="score-wrapper">
+      <div class="score-label">score:</div>
+      <div id="score"></div>
+    </div>
 </body>
 </html>
+
+<style>
+  .score-wrapper {
+    width:max-content;
+    color: rgb(100, 155, 100);
+    display: flex;
+    font-family: 'Press Start 2P', cursive;
+    gap: 5px;
+    margin: 15px auto 0;
+  }
+</style>
