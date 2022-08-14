@@ -8,26 +8,61 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
   <script src="./snake.js" defer></script>
   <script src="./snakeGame.js" defer></script>
   <title>Snake Game</title>
 </head>
 <body style="background: rgb(55,55,55);">
-    <div id="canvas-parent"></div>
+  <div class="hud-wrapper">
+    <!-- Left Side -->
     <div class="score-wrapper">
       <div class="score-label">score:</div>
       <div id="score"></div>
     </div>
+    <!-- Right Side -->
+    <div class="score-wrapper">
+      <div class="score-label">high score:</div>
+      <div id="highscore"></div>
+    </div>
+  </div> 
+  <div id="canvas-parent"></div>
 </body>
 </html>
 
 <style>
-  .score-wrapper {
-    width:max-content;
+  * {
+    box-sizing: border-box;
+  }
+  .hud-wrapper {
+    width:100%;
     color: rgb(100, 155, 100);
     display: flex;
+    /* flex-direction: column; */
+    gap: 10px;
+    justify-content: space-between;
     font-family: 'Press Start 2P', cursive;
-    gap: 5px;
-    margin: 15px auto 0;
+    margin: 10px auto 0;
   }
+
+  .score-wrapper {
+    border: 2px solid rgb(100, 155, 100);
+    padding: 5px;
+    border-radius: 50px;
+    display: flex;
+    width: max-content;
+    align-items: center;
+    font-size: .75rem;
+  }
+
+  @media only screen and (min-width: 600px) {
+  .hud-wrapper {
+    padding: 10px;
+    flex-direction: row;
+  }
+  .score-wrapper {
+    font-size: 1rem;
+    padding:8px;
+  }
+}
 </style>

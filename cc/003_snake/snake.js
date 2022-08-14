@@ -14,17 +14,17 @@ function Snake() {
     let snakeCol = floor(this.x / cell_size);
     let snakeRow = floor(this.y / cell_size);
     if (snakeCol === food.x && snakeRow === food.y) {
-      score.total++;
+      score.add(1);
       this.length++;
-      food = pickLocation();
+      food = pickLocation(this.tail);
     }
   }
 
   this.death = function() {
     for (var i = 0; i < this.tail.length; i++) {
       
-      console.log("head:", this.x/cell_size, this.y/cell_size, cell_size);
-      console.log("tail:",this.tail[i].x, this.x)
+      // console.log("head:", this.x/cell_size, this.y/cell_size, cell_size);
+      // console.log("tail:",this.tail[i].x, this.x)
       if (this.x === this.tail[i].x && this.y === this.tail[i].y) {
         console.log("death");
         return true;
@@ -67,7 +67,7 @@ function Snake() {
 
     this.death();
   }
-s
+
   this.show = function() {
     for (let i = 0; i < this.tail.length; i++) {
       fill(240);
