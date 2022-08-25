@@ -1,0 +1,31 @@
+body, html {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: rgb(114, 215, 255);
+}
+.hud-wrapper {
+top: 10px;
+left: 10px;
+position: absolute;
+}
+
+#canvas-wrapper {
+margin: 60px auto 0;
+/* border:3px solid red; */
+width:min-content;
+height: min-content;
+}
+
+.ground {
+  width: 100%; 
+  height: 100%;
+  margin-top: -6px;
+  background: rgb(61, 187, 3); 
+}
+
+button {
+cursor: pointer;
+}

@@ -5,6 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" href="./favicon/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="styles.css">
   <title>Grand Hotel</title>
   <!-- Bring in p5 cdn -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
@@ -12,32 +13,13 @@
 </head>
 <body>
   <div class="hud-wrapper">
-    <button id="populate">register</button>
-    <button id="populate">make room</button>
-    <button id="move">checkin</button>
+    <!-- <button id="move-reservations">move registrations</button>
+    <button id="new-group">new group</button>
+    <button id="checkin">checkin</button>
+    <button id="redraw">redraw</button>
+    <button id="full-cycle">full cycle</button> -->
   </div>
   <div id="canvas-wrapper"></div>
+  <div class="ground"></div>
 </body>
 </html>
-
-<style>
-  body, html {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-  }
-  .hud-wrapper {
-    top: 10px;
-    left: 10px;
-    position: absolute;
-  }
-
-  #canvas-wrapper {
-    margin: 0 auto;
-    /* border:3px solid red; */
-    width:min-content;
-    height: min-content;
-  }
-</style>

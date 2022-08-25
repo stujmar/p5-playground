@@ -9,8 +9,8 @@ class Guest {
 }
 
 class Room {
-  constructor(roomNumber, vacant, guest, type) {
-    this.roomNumber = roomNumber;
+  constructor(id, vacant, guest, type) {
+    this.id = id;
     this.vacant = vacant;
     this.guest = guest;
     this.type = type;
@@ -18,45 +18,63 @@ class Room {
 }
 
 class Reservation {
-  constructor(id, guest, room, date) {
+  constructor(id, guestId, roomId, date) {
     this.id = id;
     this.date = date;
-    this.guest = guest;
-    this.room = room;
+    this.guestId = guestId;
+    this.room = roomId;
   }
 }
 
 // Global variables
-let updated = false;
+let updated = true;
 
 // Hotel
 DIM = 9;
 GRID_SIZE = DIM * (DIM *2);
-CELL_SIZE = 25;
+CELL_SIZE = 30;
 rooms = [];
 let offset =  (window.innerWidth - (DIM * CELL_SIZE)) / 2;
 
 // Guests
 let guests = [];
+let guestId = 0;
 let guestCount = DIM * DIM * 2;
 
 // Reservations
+let day = 1;
 let reservations = [];
 
+// add event listeners
+document.getElementById("move-reservations").addEventListener("click", moveReservations);
+document.getElementById("new-group").addEventListener("click", fillVacancies);
+document.getElementById("checkin").addEventListener("click", checkinGuests);
+document.getElementById("redraw").addEventListener("click", drawFromBottom);
+document.getElementById("full-cycle").addEventListener("click", fullCycle);
+
+function fullCycle() {
+  moveReservations();
+  fillVacancies();
+  checkinGuests();
+  drawFromBottom();
+}
+
 function setup() {
-  // let canvas = createCanvas((DIM * CELL_SIZE) + (offset*2), (DIM * 2 * CELL_SIZE) + (offset*2));
-  let canvas = createCanvas(windowWidth, windowHeight);
+  console.log("day:", day);
+  // let canvas = createCanvas(windowWidth, windowHeight);
+  let canvas = createCanvas(DIM*CELL_SIZE, DIM*CELL_SIZE*2);
   canvas.parent('canvas-wrapper');
 
   background(100);
   
   // Create guests
-  let firstGuestColor = color(random(50,255), random(50,255), random(50,255));
-  for (let i = 0; i < guestCount; i++) {
-    let guestColor = firstGuestColor;
-    guests.push(new Guest(i, guestColor));
-  }
-  
+  // let firstGuestColor = color(random(50,255), random(50,255), random(50,255));
+  // for (let i = 0; i < guestCount; i++) {
+  //   let guestColor = firstGuestColor;
+  //   guests.push(new Guest(i, guestColor));
+  // }
+
+  // console.log(guests)
   // Create rooms
   for (let i = 0; i < GRID_SIZE; i++) {
     let roomNumber = i;
@@ -64,39 +82,33 @@ function setup() {
     let guest = null;
     rooms.push(new Room(roomNumber, vacant, guest, "single"));
   }
-  // console.log("create:", rooms);
-      
-  checkinGuests();
-}
-// Draw rooms
-function drawRooms() {
-  console.log("drawRooms");
-  for (let i = 0; i < DIM; i++) {
-    for(let j = 0; j < (DIM*2); j++) {
-      let index = i + j * DIM;
-
-      let room = rooms[index];
   
-      if (room.vacant == false) {
-        let guest = room.guest;
-        fill(guest.color);
-        rect(i * CELL_SIZE + offset, j * CELL_SIZE + (offset/2), CELL_SIZE, CELL_SIZE);
-      } else {
-        fill(255);
-        rect(i * CELL_SIZE + offset, j * CELL_SIZE + (offset/2), CELL_SIZE, CELL_SIZE);
-        blue += 10;
-      }
+  fillVacancies();
+  checkinGuests();
+  drawFromBottom();
+}
 
-    // write the index to the cell
-    fill(0);
-    text(index, (i * CELL_SIZE) + 2 + offset, (j * CELL_SIZE) + 18 + (offset/2));
-
+function fillVacancies() {
+  // console.log("fillVacancies:", reservations);
+  // Create reservations for empty rooms
+  let vacantRooms = getVacantRooms();
+  let currentColor = color(random(50,255), random(50,255), random(50,255));
+  rooms.forEach((room, index) => {
+    if (room.vacant == true) {
+      let newGuest = new Guest(getNewGuestId(), currentColor);
+      guests.push(newGuest);
+      let reservation = new Reservation(getNewId, newGuest.id, room.id, day);
+      console.log("pushing:", reservation);
+      reservations.push(reservation);
+      // console.log("room after:", room, reservation);
     }
-  }
+  })
+  // console.log("fillVacancies:", reservations);
 }
 
 function drawFromBottom() {
   index = 0;
+  offset = 0;
   for (let rowY = (DIM*2); rowY > 0; rowY--) {
     for (let columnX = 0; columnX < DIM; columnX++) {
 
@@ -105,6 +117,7 @@ function drawFromBottom() {
       let room = rooms[index];
       
       if (room.vacant == false) {
+        // console.log(room)
         let guest = room.guest;
         noStroke();
         fill(guest.color);
@@ -125,6 +138,17 @@ function drawFromBottom() {
   }
 }
 
+function getVacantRooms() {
+  let vacantRooms = [];
+  rooms.forEach((room) => {
+    if (reservations.find(reservation => reservation.room == room.id) == undefined) {
+      vacantRooms.push(room.id);
+    }
+  }
+  )
+  return vacantRooms;
+}
+
 function moveGuest(guestID, roomID) {
   let oldRoom = ""; // find the old room by guestID
   let guest = ""; // find the guest by guestID
@@ -140,39 +164,81 @@ function moveGuest(guestID, roomID) {
 
 function mousePressed() {
   console.log("mousePressed");
+  fullCycle();
+  // console.log(guests, rooms, reservations);
   // guests.push( new Guest(30, color(random(255), random(255), random(255))));
   // updated = false;
 }
 
 // Checkin Guests
 function checkinGuests() {
-    for (let i = 0; i < guests.length; i++) {
-      let guest = guests[i];
-      let room = rooms[i];
-      // console.log("checkin:", guest, room, i);
-      room.guest = guest;
-      room.vacant = false;
-    }
+  clearRooms();
+  // console.log("checkinGuests", guests);
+  reservations.forEach((reservation, index) => {
+    let guest = guests.filter(_guest => _guest.id == reservation.guestId)[0];
+    let room = rooms.filter(_room => _room.id == reservation.room)[0];
+    // console.log("guest:", guest, "room:", room, reservation);
+    room.guest = guest;
+    room.vacant = false;
+  })
+    // for (let i = 0; i < guests.length; i++) {
+    //   let guest = guests[i];
+    //   let room = rooms[i];
+    //   // console.log("checkin:", guest, room, i);
+    //   room.guest = guest;
+    //   room.vacant = false;
+    // }
 }
+
+function moveReservations() {
+  console.log("old reservations:", reservations);
+  let updatedReservations = [];
+  console.log("moveReservations");
+  rooms.forEach((room, index) => {
+    if (!room.vacant && room.id * 2 < rooms.length - 1) {
+      let roomId = room.id * 2;
+      let newReservation = new Reservation(getNewId, room.guest.id, roomId, day);
+      updatedReservations.push(newReservation);
+    }
+  }
+  )
+  // Set rooms w/o reservations to vacant
+  rooms.forEach((room) => {
+    let isVacant = updatedReservations.filter(res => res.room == room.id).length == 0
+    console.log(room.id, isVacant);
+    if (isVacant) {
+      room.vacant = true;
+      room.guest = null;
+    }
+  })
+  reservations = updatedReservations;
+  console.log("new reservations:", reservations);
+  console.log("new rooms:", rooms);
+}
+
+function clearRooms() {
+  rooms.forEach((room, index) => {
+    room.guest = null;
+    room.vacant = true;
+  }
+)}
+
 
 function draw() {
   if(!updated) {
-    checkinGuests();
-    drawFromBottom();
+    console.log("updating")
+    // checkinGuests();
+    // drawFromBottom();
     updated = true;
   }
 }
 
-class Booking {
-  constructor(id, roomNumber, guest) {
-    this.id = id;
-    this.roomNumber = roomNumber;
-    this.guest = guest;
-  }
+function getNewGuestId() {
+  guestId++;
+  return guestId;
+}
 
-  fillMultiARray(array, value) {
-    for (let i = 0; i < array.length; i++) {
-      array[i] = value;
-    }
-  }
+function getNewId() {
+  guestId++;
+  return guestId;
 }
