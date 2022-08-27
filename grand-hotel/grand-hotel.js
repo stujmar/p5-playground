@@ -28,11 +28,12 @@ class Reservation {
 
 // Global variables
 let updated = true;
+let cloud;
 
 // Hotel
 DIM = 9;
 GRID_SIZE = DIM * (DIM *2);
-CELL_SIZE = 30;
+CELL_SIZE = 20;
 rooms = [];
 let offset =  (window.innerWidth - (DIM * CELL_SIZE)) / 2;
 
@@ -46,11 +47,11 @@ let day = 1;
 let reservations = [];
 
 // add event listeners
-document.getElementById("move-reservations").addEventListener("click", moveReservations);
-document.getElementById("new-group").addEventListener("click", fillVacancies);
-document.getElementById("checkin").addEventListener("click", checkinGuests);
-document.getElementById("redraw").addEventListener("click", drawFromBottom);
-document.getElementById("full-cycle").addEventListener("click", fullCycle);
+// document.getElementById("move-reservations").addEventListener("click", moveReservations);
+// document.getElementById("new-group").addEventListener("click", fillVacancies);
+// document.getElementById("checkin").addEventListener("click", checkinGuests);
+// document.getElementById("redraw").addEventListener("click", drawFromBottom);
+// document.getElementById("full-cycle").addEventListener("click", fullCycle);
 
 function fullCycle() {
   moveReservations();
@@ -59,22 +60,21 @@ function fullCycle() {
   drawFromBottom();
 }
 
+function preload() {
+  console.log('preloading');
+  cloud = loadImage('./assets/cloud.svg');
+}
+
 function setup() {
   console.log("day:", day);
   // let canvas = createCanvas(windowWidth, windowHeight);
   let canvas = createCanvas(DIM*CELL_SIZE, DIM*CELL_SIZE*2);
+  // let scene = createCanvas(300, 300);
   canvas.parent('canvas-wrapper');
-
-  background(100);
   
-  // Create guests
-  // let firstGuestColor = color(random(50,255), random(50,255), random(50,255));
-  // for (let i = 0; i < guestCount; i++) {
-  //   let guestColor = firstGuestColor;
-  //   guests.push(new Guest(i, guestColor));
-  // }
-
-  // console.log(guests)
+  background(100);
+  image(cloud, 50, 10);
+  
   // Create rooms
   for (let i = 0; i < GRID_SIZE; i++) {
     let roomNumber = i;
@@ -86,10 +86,10 @@ function setup() {
   fillVacancies();
   checkinGuests();
   drawFromBottom();
+  setInterval(fullCycle, 1500);
 }
 
 function fillVacancies() {
-  // console.log("fillVacancies:", reservations);
   // Create reservations for empty rooms
   let vacantRooms = getVacantRooms();
   let currentColor = color(random(50,255), random(50,255), random(50,255));
@@ -98,7 +98,7 @@ function fillVacancies() {
       let newGuest = new Guest(getNewGuestId(), currentColor);
       guests.push(newGuest);
       let reservation = new Reservation(getNewId, newGuest.id, room.id, day);
-      console.log("pushing:", reservation);
+      // console.log("pushing:", reservation);
       reservations.push(reservation);
       // console.log("room after:", room, reservation);
     }
@@ -119,20 +119,25 @@ function drawFromBottom() {
       if (room.vacant == false) {
         // console.log(room)
         let guest = room.guest;
-        noStroke();
-        fill(guest.color);
+        stroke(241,87,88);
+        // stroke thickness
+        strokeWeight(5);
+        fill(66,0,0);
         rect(positionX, positionY, CELL_SIZE, CELL_SIZE);
         // draw a circle at the center of the room
-        fill(255,200,245);
+        noStroke();
+        // fill(255,200,245);
+        fill(guest.color);
         ellipse(positionX + (CELL_SIZE/2), positionY + (CELL_SIZE/2), CELL_SIZE/2, CELL_SIZE/2);
+        rect(positionX + ((CELL_SIZE*.4)/2), positionY + (CELL_SIZE - CELL_SIZE/3 -2), CELL_SIZE*.6, CELL_SIZE/3);
       } else {
         fill(255);
         rect(positionX, positionY, CELL_SIZE, CELL_SIZE);
       }
-
-      fill(0)
-      noStroke();
-      text(index, positionX, positionY + CELL_SIZE);
+      // room numbers
+      // fill(0)
+      // noStroke();
+      // text(index, positionX, positionY + CELL_SIZE);
       index++;
     }
   }
@@ -149,25 +154,9 @@ function getVacantRooms() {
   return vacantRooms;
 }
 
-function moveGuest(guestID, roomID) {
-  let oldRoom = ""; // find the old room by guestID
-  let guest = ""; // find the guest by guestID
-  let newRoom = ""; // find the new room by roomID
-
-  oldRoom.guest = null; // set the old room to vacant
-  oldRoom.vacant = true; // set the old room to vacant
-
-  newRoom.guest = guest; // set the new room to the guest
-  newRoom.vacant = false; // set the new room to not vacant
-  
-}
-
 function mousePressed() {
   console.log("mousePressed");
   fullCycle();
-  // console.log(guests, rooms, reservations);
-  // guests.push( new Guest(30, color(random(255), random(255), random(255))));
-  // updated = false;
 }
 
 // Checkin Guests
@@ -177,26 +166,16 @@ function checkinGuests() {
   reservations.forEach((reservation, index) => {
     let guest = guests.filter(_guest => _guest.id == reservation.guestId)[0];
     let room = rooms.filter(_room => _room.id == reservation.room)[0];
-    // console.log("guest:", guest, "room:", room, reservation);
     room.guest = guest;
     room.vacant = false;
   })
-    // for (let i = 0; i < guests.length; i++) {
-    //   let guest = guests[i];
-    //   let room = rooms[i];
-    //   // console.log("checkin:", guest, room, i);
-    //   room.guest = guest;
-    //   room.vacant = false;
-    // }
 }
 
 function moveReservations() {
-  console.log("old reservations:", reservations);
   let updatedReservations = [];
-  console.log("moveReservations");
   rooms.forEach((room, index) => {
     if (!room.vacant && room.id * 2 < rooms.length - 1) {
-      let roomId = room.id * 2;
+      let roomId = (room.id * 2) + 1;
       let newReservation = new Reservation(getNewId, room.guest.id, roomId, day);
       updatedReservations.push(newReservation);
     }
@@ -205,15 +184,12 @@ function moveReservations() {
   // Set rooms w/o reservations to vacant
   rooms.forEach((room) => {
     let isVacant = updatedReservations.filter(res => res.room == room.id).length == 0
-    console.log(room.id, isVacant);
     if (isVacant) {
       room.vacant = true;
       room.guest = null;
     }
   })
   reservations = updatedReservations;
-  console.log("new reservations:", reservations);
-  console.log("new rooms:", rooms);
 }
 
 function clearRooms() {
@@ -225,12 +201,19 @@ function clearRooms() {
 
 
 function draw() {
-  if(!updated) {
-    console.log("updating")
-    // checkinGuests();
-    // drawFromBottom();
-    updated = true;
-  }
+  // {
+  //   sleep(5000).then(function() {
+  //     fullCycle();
+  //   })}
+  // call function every 4 seconds
+
+
+  // if(!updated) {
+  //   console.log("updating")
+  //   // checkinGuests();
+  //   // drawFromBottom();
+  //   updated = true;
+  // }
 }
 
 function getNewGuestId() {
@@ -241,4 +224,12 @@ function getNewGuestId() {
 function getNewId() {
   guestId++;
   return guestId;
+}
+
+// a custom 'sleep' or wait' function, that returns a Promise that resolves only after a timeout
+function sleep(millisecondsDuration)
+{
+  return new Promise((resolve) => {
+    setTimeout(resolve, millisecondsDuration);
+  })
 }
