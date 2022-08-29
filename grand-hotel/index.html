@@ -9,6 +9,7 @@
   <title>Grand Hotel</title>
   <!-- Bring in p5 cdn -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+  <script src="./grand-hotel.classes.js" defer></script>
   <script src="./grand-hotel.js" defer></script>
 </head>
 <body>
@@ -22,9 +23,12 @@
   <div class="container">
     <div class="hotel-wrapper">
       <div id="canvas-wrapper"></div>
-      <div class="lobby"></div>
+      <!-- <div class="lobby"></div> -->
     </div>
-    <div class="ground"></div>
+    <div class="ground">
+      <input type="range" name="timeSlider" id="timeSlider" value="120" min="1" max="240">
+      <!-- <input type="range" name="timeSlider" id="timeSlider" value="24" min="1" max="48"> -->
+    </div>
   </div>
 </body>
 </html>

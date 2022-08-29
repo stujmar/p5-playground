@@ -4,7 +4,7 @@ body, html {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background: rgb(114, 215, 255);
+  background: rgb(150, 225, 255);
 }
 .hud-wrapper {
 top: 10px;
@@ -13,6 +13,7 @@ position: absolute;
 }
 
 .container {
+  background: rgb(128, 219, 255);
   display: flex;
   flex-direction: column;
   padding: 0 0;
@@ -38,15 +39,49 @@ position: absolute;
 /* border:3px solid red; */
 width:min-content;
 height: min-content;
-margin-bottom: -9px;
-border: 5px solid rgb(241,87,88);
+/* margin-bottom: -9px; */
+/* border: 5px solid rgb(241,87,88); */
 }
+
 
 .ground {
   width: 100%; 
-  background: rgb(101, 187, 3); 
+  margin-top: -5px;
+  background: rgb(154, 221, 78); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
   flex-grow: 1;
 }
+
+.ground input {
+  transform: rotate(180deg);
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 15px;
+  background: green;
+  cursor: pointer;
+  width: 15rem;
+}
+
+/* Special styling for WebKit/Blink */
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  border: 1px solid #1b4e03;
+  height: 30px;
+  width: 30px;
+  border-radius: 15px;
+  background: rgb(154, 221, 78);
+  cursor: pointer;
+  margin: -4px 0; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+  box-shadow: 0px -1px 4px #0000007c, 0px 0px 1px #0d0d0d; /* Add cool effects to your sliders! */
+}
+
+
+
 
 button {
 cursor: pointer;
@@ -59,8 +94,9 @@ cursor: pointer;
 /* 'sm': '640px', */
 @media (min-width: 640px) {
   .container {
-    width: 640px;
-    height: 640px;
+    /* width: 640px; */
+    width: min-content;
+    height: 600px;
     margin: 20px auto 0;
     border-radius: 20px;
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.15);
