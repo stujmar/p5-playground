@@ -1,4 +1,4 @@
-console.log("grand-hotel-class.js");
+console.log(" ... loading classes ...");
 
 class Guest {
   constructor(id, color, keycard=null) {
