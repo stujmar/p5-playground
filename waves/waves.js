@@ -1,29 +1,23 @@
 console.log('waves.js loaded');
 
+const gui = new dat.GUI();
+// console.log(gui);
 const canvas = document.getElementById('sin-wave');
 canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.height = window.innerHeight -100;
+console.log(canvas.width, canvas.height);
 
-const c = canvas.getContext('2d');
+const ctx = canvas.getContext('2d');
 
 // make stroke with 2px red.
+let amplitude = 100;
+let frequency = 0.01;
 
+ctx.beginPath();
+ctx.moveTo(0, canvas.height/2);
 
-c.beginPath();
-c.moveTo(0, canvas.height/2);
-
-for (let i = 0; i < canvas.width; i+=3) {
-  if( i % 2 == 0) {
-    // make line green
-    console.log('green');
-    c.strokeStyle = "green";
-    c.lineTo(i, canvas.height/2 + 100 * Math.sin(i/100) + 200);
-  } else {
-    // make line blue
-    c.strokeStyle = "red";
-    c.lineTo(i, canvas.height/2 + 100 * Math.sin(i/100) - 200);
-  }
-
+for (let i = 0; i < canvas.width; i++) {
+  ctx.lineTo(i, (canvas.height/2) + Math.sin(i * frequency) * amplitude);
 }
 
-c.stroke();
+ctx.stroke();
