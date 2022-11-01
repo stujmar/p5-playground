@@ -28,8 +28,11 @@ gui.add(wave, 'lineWidth', 1, 10);
 
 let incement = wave.frequency;
 function animate() {
+  
+
+
   ctx.fillStyle = `rgba(255, 255, 255, ${wave.trails})`;
-  ctx.strokeStyle = "rgb(255, 155, 155)";
+  ctx.strokeStyle = "hsl(0, 50%, 50%)";
   
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.beginPath();
