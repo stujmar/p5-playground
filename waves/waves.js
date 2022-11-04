@@ -49,7 +49,7 @@ function animate() {
 
   // have hue ping pong between 0-255
 
-  ctx.fillStyle = `rgba(${background}, ${background}, ${background}, ${wave.trails})`;
+  ctx.fillStyle = `rgba(${wave.background}, ${wave.background}, ${wave.background}, ${wave.trails})`;
   ctx.strokeStyle = `hsl(${hue}, 50%, 50%)`;
   
   ctx.fillRect(0, 0, canvas.width, canvas.height);
