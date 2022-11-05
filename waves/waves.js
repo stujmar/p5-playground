@@ -10,19 +10,19 @@ const ctx = canvas.getContext('2d');
 
 let hue = 0;
 const strokeColor = {
-  h: 200,
+  h: 115,
   s: 50,
   l: 50
 }
 
 const wave = {
-  background: 255,
+  background: 0,
   y: canvas.height/2,
   length: 0.002,
   amplitude: 200,
   frequency: 0.01,
-  trails: 0.010,
-  lineWidth: 1
+  trails: 1,
+  lineWidth: 5
 };
 
 const waveFolder = gui.addFolder('Wave');
@@ -36,9 +36,11 @@ waveFolder.add(wave, 'frequency', 0.01, 1);
 waveFolder.add(wave, 'amplitude', -300, 300);
 waveFolder.add(wave, 'trails', 0.01, 1);
 waveFolder.add(wave, 'lineWidth', 1, 10);
+waveFolder.open();
 colorFolder.add(strokeColor, 'h', 0, 255);
 colorFolder.add(strokeColor, 's', 0, 100);
 colorFolder.add(strokeColor, 'l', 0, 100);
+colorFolder.open();
 
 
 
@@ -50,7 +52,7 @@ function animate() {
   // have hue ping pong between 0-255
 
   ctx.fillStyle = `rgba(${wave.background}, ${wave.background}, ${wave.background}, ${wave.trails})`;
-  ctx.strokeStyle = `hsl(${hue}, 50%, 50%)`;
+  ctx.strokeStyle = `hsl(${strokeColor.h}, ${strokeColor.s}%, ${strokeColor.l}%)`;
   
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.beginPath();
