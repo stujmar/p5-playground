@@ -65,15 +65,6 @@ function animate() {
   // draw background
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // ctx.beginPath();
-  // ctx.moveTo(-wave.lineWidth, canvas.height/2);
-  // for (let i = -wave.lineWidth; i < canvas.width + 10; i++) { 
-  //   if (i < canvas.width + 100) {
-  //     ctx.lineTo(i, (wave.y) + Math.sin(i * wave.length + increment) * wave.amplitude * Math.sin(increment));
-  //   }
-  // }
-  // ctx.lineWidth = wave.lineWidth;
-  // ctx.stroke();
   drawWave(wave.echo, wave.echoOffset);
 
   increment += wave.frequency;
@@ -83,18 +74,17 @@ function animate() {
 animate();
 
 function drawWave(echo, offset) {
-  for (let waveCount = 1; waveCount <= wave.echo; waveCount++) {
+  for (let waveCount = 1; waveCount <= echo + 1; waveCount++) {
     ctx.beginPath();
     ctx.moveTo(-wave.lineWidth, canvas.height/2);
     let previous = -200;
     for (let i = -wave.lineWidth; i < canvas.width + 10; i++) { 
       if (i > previous) {
-        ctx.lineTo(i, (wave.y - (waveCount * wave.echoOffset)) + Math.sin(i * wave.length + increment) * wave.amplitude * Math.sin(increment));
+        ctx.lineTo(i, (wave.y - (waveCount * offset)) + Math.sin(i * wave.length + increment) * wave.amplitude * Math.sin(increment));
         previous = i;
       }
     }
     ctx.lineWidth = wave.lineWidth;
     ctx.stroke();
   }
-
 }
